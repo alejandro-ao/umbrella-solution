@@ -1,0 +1,11 @@
+langchain
+langchain-community
+langchain-chroma>=0.1.2
+langchain-groq
+langchain-openai
+streamlit
+pypdf
+python-dotenv
+faker
+faiss-cpu
+
