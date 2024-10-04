@@ -36,11 +36,9 @@ if __name__ == "__main__":
 
             embedding_function = OpenAIEmbeddings()
 
-            # Use Chroma instead of FAISS
             vectorstore = Chroma.from_documents(
                 documents=splits,
                 embedding=embedding_function,
-                persist_directory="./chroma_db",  # Specify a persistence directory
             )
 
             return vectorstore
@@ -49,7 +47,6 @@ if __name__ == "__main__":
             st.error(f"Failed to initialize vector store: {str(e)}")
             return None
 
-    # Usage
     vector_store = init_vector_store("data/umbrella_corp_policies.pdf")
     if vector_store is None:
         st.error(
