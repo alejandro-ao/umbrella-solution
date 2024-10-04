@@ -1,8 +1,9 @@
 from langchain_groq import ChatGroq
 from dotenv import load_dotenv
-from prompts import ENGIE_SYSTEM_PROMPT, ENGIE_WELCOME_MESSAGE
+from prompts import SYSTEM_PROMPT, WELCOME_MESSAGE
 from synthetic_data import generate_employee_data
-from engie_assistant import EngieAssistant
+from gui import AssistantGUI
+from assistant import Assistant
 import streamlit as st
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -14,7 +15,7 @@ import logging
 if __name__ == "__main__":
 
     load_dotenv()
-    
+
     logging.basicConfig(level=logging.INFO)
 
     st.set_page_config(page_title="Umbrella Onboarding", page_icon="☂", layout="wide")
@@ -57,8 +58,8 @@ if __name__ == "__main__":
         st.stop()
 
     llm = ChatGroq()
-    system_prompt = ENGIE_SYSTEM_PROMPT
-    welcome_message = ENGIE_WELCOME_MESSAGE
+    system_prompt = SYSTEM_PROMPT
+    welcome_message = WELCOME_MESSAGE
     customer_data = get_user_data()
     vector_store = init_vector_store("./data/umbrella_corp_policies.pdf")
 
@@ -67,11 +68,13 @@ if __name__ == "__main__":
     if "messages" not in st.session_state:
         st.session_state.messages = [{"role": "ai", "content": welcome_message}]
 
-    assistant = EngieAssistant(
+    assistant = Assistant(
         system_prompt=system_prompt,
         llm=llm,
-        customer_data=st.session_state.customer,
-        history=st.session_state.messages,
+        employee_information=st.session_state.customer,
+        message_history=st.session_state.messages,
         vector_store=vector_store,
     )
-    assistant.render()
+
+    gui = AssistantGUI(assistant=assistant)
+    gui.render()

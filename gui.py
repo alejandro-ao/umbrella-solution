@@ -1,48 +1,13 @@
 import streamlit as st
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 
-
-class EngieAssistant:
-    def __init__(
-        self, customer_data, system_prompt, llm, history=[], vector_store=None
-    ):
-        self.customer = customer_data
-        self.system_prompt = system_prompt
-        self.llm = llm
-        self.messages = history
-        self.vector_store = vector_store
-        self.employee_information = customer_data
-
-        self.chain = self.get_conversation_chain()
-
-    def get_conversation_chain(self):
-        prompt = ChatPromptTemplate(
-            [
-                ("system", self.system_prompt),
-                MessagesPlaceholder("conversation_history"),
-                ("human", "{user_input}"),
-            ]
-        )
-        llm = self.llm
-        output_parser = StrOutputParser()
-
-        chain = (
-            {
-                "retrieved_policy_information": self.vector_store.as_retriever(),
-                "employee_information": lambda x: self.employee_information,
-                "user_input": RunnablePassthrough(),
-                "conversation_history": lambda x: self.messages,
-            }
-            | prompt
-            | llm
-            | output_parser
-        )
-        return chain
+class AssistantGUI:
+    def __init__(self, assistant):
+        self.assistant = assistant
+        self.messages = assistant.messages
+        self.employee_information = assistant.employee_information
 
     def get_response(self, user_input):
-        return self.chain.stream(user_input)
+        return self.assistant.get_response(user_input)
 
     def render_messages(self):
         messages = self.messages
